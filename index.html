@@ -25,8 +25,11 @@ let config = {
 
 let player,
     game = new Phaser.Game(config),
+    score = 0,
     cursors,
-    ground;
+    ground,
+    star,
+    scoreText;
 
 function preload ()
 {
@@ -34,6 +37,7 @@ function preload ()
     //params = size of each sprite
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
     this.load.image('ground', 'assets/platform.png');
+    this.load.image('star', 'assets/star.png');
 }
 
 // like init
@@ -47,11 +51,28 @@ function create ()
     cursors = this.input.keyboard.createCursorKeys();
     player.setCollideWorldBounds(true);
     ground = this.physics.add.staticGroup();
+    star = this.physics.add.group();
     ground.create(400, 568, 'ground').setScale(2).refreshBody();
     ground.create(600, 400, 'ground');
     ground.create(50, 250, 'ground');
     ground.create(750, 220, 'ground');
     this.physics.add.collider(player, ground);
+    this.physics.add.collider(star, ground);
+    this.physics.add.overlap(player, star, collectStar, null, this);
+    star.create(10, 10, 'star');
+    star.create(50, 10, 'star');
+    star.create(150, 10, 'star');
+    star.create(200, 10, 'star');
+    star.create(270, 10, 'star');
+    star.create(320, 10, 'star');
+    star.create(370, 10, 'star');
+    star.create(420, 10, 'star');
+    star.create(455, 10, 'star');
+    star.create(490, 10, 'star');
+    star.create(550, 10, 'star');
+    star.create(585, 10, 'star');
+    star.create(620, 10, 'star');
+    star.create(650, 10, 'star');
 
     this.anims.create({
         key: 'left',
@@ -73,10 +94,20 @@ function create ()
         frameRate: 10,
         repeat: -1
     });
+
+    scoreText = this.add.text(16, 16, 'score: 0', { 
+        fontSize: '32px',
+        fill: '#000'
+    });
 }
 
-function update ()
-{
+function collectStar(player, star) {
+    star.disableBody(true, true);
+    score += 10;
+    scoreText.setText('score: ' + score);
+}
+
+function update() {
     if (cursors.left.isDown) {
         player.setVelocityX(-160);
         player.anims.play('left', true);
