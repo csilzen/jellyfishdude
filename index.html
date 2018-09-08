@@ -28,7 +28,7 @@ let player,
     score = 0,
     cursors,
     ground,
-    star,
+    stars,
     scoreText;
 
 function preload ()
@@ -37,7 +37,8 @@ function preload ()
     //params = size of each sprite
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
     this.load.image('ground', 'assets/platform.png');
-    this.load.image('star', 'assets/star.png');
+    this.load.image('stars', 'assets/star.png');
+    this.load.image('bomb', 'assets/bomb.png');
 }
 
 // like init
@@ -46,33 +47,42 @@ function create ()
     // x, y positioning are based on half of the game size (lines 11-12)
     // phaser centers images by default, rather than positioning from top left corner
     this.add.image(400, 300, 'sky');
+
     player = this.physics.add.sprite(100, 150, 'dude');
     //wires directional keys to `cursors`
     cursors = this.input.keyboard.createCursorKeys();
     player.setCollideWorldBounds(true);
     ground = this.physics.add.staticGroup();
-    star = this.physics.add.group();
+    stars = this.physics.add.group();
+    bomb = this.physics.add.group();
+
     ground.create(400, 568, 'ground').setScale(2).refreshBody();
     ground.create(600, 400, 'ground');
     ground.create(50, 250, 'ground');
     ground.create(750, 220, 'ground');
     this.physics.add.collider(player, ground);
-    this.physics.add.collider(star, ground);
-    this.physics.add.overlap(player, star, collectStar, null, this);
-    star.create(10, 10, 'star');
-    star.create(50, 10, 'star');
-    star.create(150, 10, 'star');
-    star.create(200, 10, 'star');
-    star.create(270, 10, 'star');
-    star.create(320, 10, 'star');
-    star.create(370, 10, 'star');
-    star.create(420, 10, 'star');
-    star.create(455, 10, 'star');
-    star.create(490, 10, 'star');
-    star.create(550, 10, 'star');
-    star.create(585, 10, 'star');
-    star.create(620, 10, 'star');
-    star.create(650, 10, 'star');
+    this.physics.add.collider(stars, ground);
+    this.physics.add.overlap(player, stars, collectStar, null, this);
+    this.physics.add.overlap(player, bomb);
+    this.physics.add.collider(ground, bomb);
+    stars.create(10, 10, 'stars');
+    stars.create(50, 10, 'stars');
+    stars.create(150, 10, 'stars');
+    stars.create(200, 10, 'stars');
+    stars.create(270, 10, 'stars');
+    stars.create(320, 10, 'stars');
+    stars.create(370, 10, 'stars');
+    stars.create(420, 10, 'stars');
+    stars.create(455, 10, 'stars');
+    stars.create(490, 10, 'stars');
+    stars.create(550, 10, 'stars');
+    stars.create(585, 10, 'stars');
+    stars.create(620, 10, 'stars');
+    stars.create(650, 10, 'stars');
+
+    stars.children.iterate(function (child) {
+        child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+    });
 
     this.anims.create({
         key: 'left',
@@ -101,13 +111,14 @@ function create ()
     });
 }
 
-function collectStar(player, star) {
-    star.disableBody(true, true);
+function collectStar(player, stars) {
+    stars.disableBody(true, true);
     score += 10;
     scoreText.setText('score: ' + score);
 }
 
 function update() {
+
     if (cursors.left.isDown) {
         player.setVelocityX(-160);
         player.anims.play('left', true);
